@@ -1,4 +1,6 @@
 //TODO add styles
+//TODO add chrome css extension to scripts
+//TODO add buttons to toggle css extensions, change theme
 
 import * as vscode from 'vscode';
 
@@ -27,21 +29,23 @@ function startExtension(context: vscode.ExtensionContext) {
   panel.onDidDispose(() => {}, null, context.subscriptions);
   panel.webview.html = getComponentHTML();
 
-  vscode.window.onDidChangeTextEditorSelection(e => {
-    var fileSelected = e.textEditor.document.fileName;
-    if (fileSelected !== currentFile) {
-      updatePanel();
-      currentFile = fileSelected;
-    }
-  });
-
-  vscode.workspace.onDidChangeTextDocument(e => {
-    if (e.contentChanges.length > 0) {
-      if (docLangIsSupported) {
+  context.subscriptions.push(
+    vscode.window.onDidChangeTextEditorSelection(e => {
+      var fileSelected = e.textEditor.document.fileName;
+      if (fileSelected !== currentFile) {
         updatePanel();
+        currentFile = fileSelected;
       }
-    }
-  });
+    }),
+
+    vscode.workspace.onDidChangeTextDocument(e => {
+      if (e.contentChanges.length > 0) {
+        if (docLangIsSupported) {
+          updatePanel();
+        }
+      }
+    })
+  );
 
   function updatePanel() {
     if (docLangIsSupported) {
