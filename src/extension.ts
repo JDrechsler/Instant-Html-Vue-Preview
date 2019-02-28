@@ -1,6 +1,7 @@
 //TODO add styles
 //TODO add chrome css extension to scripts
 //TODO add buttons to toggle css extensions, change theme
+//TODO add possibility to replace all images with very small placeholders
 
 import * as vscode from 'vscode';
 
