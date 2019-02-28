@@ -1,3 +1,5 @@
+//TODO add styles
+
 import * as vscode from 'vscode';
 
 const regVueTemplate = new RegExp('(?<=<template>).*(?=</template>)', 's');
