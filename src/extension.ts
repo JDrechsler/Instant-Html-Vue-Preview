@@ -6,7 +6,30 @@
 import * as vscode from 'vscode';
 
 const regVueTemplate = new RegExp('(?<=<template>).*(?=</template>)', 's');
+const regVueStyle = new RegExp(
+  '(?<=<style scoped>|<style>).*(?=</style>)',
+  's'
+);
+
 const supportedDocLanguages = ['html', 'vue'];
+
+const htmlTemplate = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Page Title</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      *styles*
+    </style>
+  </head>
+  <body>
+    *body*
+  </body>
+  </html>
+`;
+
 let currentFile = '';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -68,9 +91,22 @@ function getComponentHTML(): string {
   if (docLanguageId.toLocaleLowerCase() === 'html') {
     return vscode.window.activeTextEditor.document.getText();
   } else if (docLanguageId.toLocaleLowerCase() === 'vue') {
+    let htmlPart = 'I did not understand this html.';
+    let cssPart = 'I did not understand this css.';
+
     const vueTemplateMatches = regVueTemplate.exec(currentDocText);
     if (vueTemplateMatches.length > 0) {
-      return vueTemplateMatches[0];
+      htmlPart = vueTemplateMatches[0];
+    }
+    const vueStyleMatches = regVueStyle.exec(currentDocText);
+    if (vueStyleMatches.length > 0) {
+      cssPart = vueStyleMatches[0];
+      let htmlCssCombined = htmlTemplate
+        .replace('*styles*', cssPart)
+        .replace('*body*', htmlPart);
+      return htmlCssCombined;
+    } else {
+      return htmlPart;
     }
   }
   return currentDocText;
