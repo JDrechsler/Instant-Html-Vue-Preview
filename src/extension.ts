@@ -47,7 +47,7 @@ function startExtension(context: vscode.ExtensionContext) {
     vscode.ViewColumn.Beside,
     {
       retainContextWhenHidden: true,
-      enableScripts: false
+      enableScripts: true
     }
   );
   panel.onDidDispose(() => {}, null, context.subscriptions);
