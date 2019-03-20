@@ -1,10 +1,13 @@
 {
-  "name": "cat-coding",
-  "description": "Cat Coding - A Webview API Sample",
+  "name": "vue-component-preview",
+  "description": "Preview Vue / html files",
   "version": "0.0.1",
-  "publisher": "vscode-samples",
+  "publisher": "JDrechslerUS",
   "engines": {
     "vscode": "^1.26.0"
+  },
+  "repository": {
+    "url": "https://github.com/JDrechsler/Vue-Component-Preview"
   },
   "categories": [
     "Other"
