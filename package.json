@@ -1,6 +1,7 @@
 {
-  "name": "vue-component-preview",
-  "description": "Instant Preview Vue / html files",
+  "name": "instant-html-vue-preview",
+  "description": "Instant Preview HTML / Vue Files",
+	"displayName": "Instant Preview HTML / Vue Files",
   "version": "0.0.2",
   "publisher": "JDrechslerUS",
   "engines": {
