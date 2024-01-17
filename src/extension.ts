@@ -1,8 +1,3 @@
-//TODO add chrome css extension to scripts
-//TODO add buttons to toggle css extensions, change theme
-//TODO add possibility to replace all images with very small placeholders
-//TODO add possibility to see custom components
-
 import * as vscode from 'vscode';
 
 const regVueTemplate = new RegExp('(?<=<template>).*(?=</template>)', 's');
@@ -20,6 +15,7 @@ const htmlTemplate = `
     <title>Page Title</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       *styles*
     </style>
@@ -34,7 +30,7 @@ let currentFile = '';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('vueComponentPreview.start', () => {
+    vscode.commands.registerCommand('instantHtmlVueComponentPreview.start', () => {
       startExtension(context);
     })
   );
@@ -42,8 +38,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 function startExtension(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
-    'vueComponent',
-    'Vue Component Preview',
+    'instantHtmlVueComponent',
+    'Instant Html / Vue Preview',
     vscode.ViewColumn.Beside,
     {
       retainContextWhenHidden: true,
@@ -89,7 +85,7 @@ function getComponentHTML(): string {
   const docLanguageId = vscode.window.activeTextEditor.document.languageId;
 
   if (docLanguageId.toLocaleLowerCase() === 'html') {
-    return vscode.window.activeTextEditor.document.getText();
+    return htmlTemplate.replace('*body*', currentDocText)
   } else if (docLanguageId.toLocaleLowerCase() === 'vue') {
     let htmlPart = 'I did not understand this html.';
     let cssPart = 'I did not understand this css.';

@@ -1,7 +1,7 @@
 {
   "name": "vue-component-preview",
-  "description": "Preview Vue / html files",
-  "version": "0.0.1",
+  "description": "Instant Preview Vue / html files",
+  "version": "0.0.2",
   "publisher": "JDrechslerUS",
   "engines": {
     "vscode": "^1.26.0"
@@ -13,30 +13,29 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vueComponentPreview.start",
-    "onWebviewPanel:vueComponent"
+    "onWebviewPanel:instantHtmlVueComponent"
   ],
   "main": "./outDir/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vueComponentPreview.start",
-        "title": "Start the vue component preview",
-        "category": "Vue Component"
+        "command": "instantHtmlVueComponentPreview.start",
+        "title": "Start Preview",
+        "category": "Instant Html / Vue Preview"
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "prepack": "vsce package",
     "compile": "tsc -p ./",
     "watch": "tsc -w -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^10.5.2",
-    "tslint": "^5.11.0",
-    "typescript": "^2.9.2",
-    "vscode": "^1.1.29"
+    "@types/node": "20.11.5",
+    "@vscode/vsce": "^2.22.0",
+    "tslint": "6.1.3",
+    "typescript": "5.3.3",
+    "vscode": "1.1.37"
   }
 }
