@@ -1,6 +1,6 @@
-# Vue-Component-Preview
+# Instant-Html-Vue-Preview
 
-A VS Code extension that allows previewing vue components while developing
+A VS Code extension that allows previewing html / vue files while developing
 
 ## Install vsce tools
 
