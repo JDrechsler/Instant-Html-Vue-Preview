@@ -1,4 +1,6 @@
+import path = require('path');
 import * as vscode from 'vscode';
+import fs = require('fs');
 
 const regVueTemplate = new RegExp('(?<=<template>).*(?=</template>)', 's');
 const regVueStyle = new RegExp(
@@ -13,20 +15,17 @@ const htmlTemplate = `
   <html>
   <head>
     <title>Page Title</title>
+    *baseHref*
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      *styles*
-    </style>
+    <script>*tailwindConfig*</script>
   </head>
   <body>
     *body*
   </body>
   </html>
 `;
-
-let currentFile = '';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -44,18 +43,19 @@ function startExtension(context: vscode.ExtensionContext) {
     {
       retainContextWhenHidden: true,
       enableScripts: true
-    }
+    },    
   );
+  const workspaceFolderPath = vscode.workspace.workspaceFolders[0];
+  const tailwindConfigPath = path.join(workspaceFolderPath.uri.path, 'tailwind.config.js');
+  const mediaPath = vscode.Uri.file(path.join(workspaceFolderPath.uri.path, '')).with({
+    scheme: "vscode-resource"
+  }).toString() + '/';
   panel.onDidDispose(() => {}, null, context.subscriptions);
   panel.webview.html = getComponentHTML();
 
   context.subscriptions.push(
     vscode.window.onDidChangeTextEditorSelection(e => {
-      var fileSelected = e.textEditor.document.fileName;
-      if (fileSelected !== currentFile) {
-        updatePanel();
-        currentFile = fileSelected;
-      }
+      updatePanel();
     }),
 
     vscode.workspace.onDidChangeTextDocument(e => {
@@ -66,6 +66,47 @@ function startExtension(context: vscode.ExtensionContext) {
       }
     })
   );
+
+  function getComponentHTML(): string {
+    const currentDocText = vscode.window.activeTextEditor.document.getText();
+    const docLanguageId = vscode.window.activeTextEditor.document.languageId;
+  
+    if (docLanguageId.toLocaleLowerCase() === 'html') {
+      let html = htmlTemplate
+        .replace('*baseHref*', `<base href="${mediaPath}">`)
+        .replace('*body*', currentDocText);
+
+      // Check if tailwind.config.js exists
+      if (fs.existsSync(tailwindConfigPath)) {
+        const tailwindConfigString = fs.readFileSync(tailwindConfigPath, 'utf8')
+          .replace('export default', 'tailwind.config =');
+        html = html.replace('*tailwindConfig*', tailwindConfigString);
+      } else {
+        html = html.replace('<script>*tailwindConfig*</script>', '');
+      }
+      
+      return html;
+    } else if (docLanguageId.toLocaleLowerCase() === 'vue') {
+      let htmlPart = 'I did not understand this html.';
+      let cssPart = 'I did not understand this css.';
+  
+      const vueTemplateMatches = regVueTemplate.exec(currentDocText);
+      if (vueTemplateMatches.length > 0) {
+        htmlPart = vueTemplateMatches[0];
+      }
+      const vueStyleMatches = regVueStyle.exec(currentDocText);
+      if (vueStyleMatches.length > 0) {
+        cssPart = vueStyleMatches[0];
+        let htmlCssCombined = htmlTemplate
+          .replace('*styles*', cssPart)
+          .replace('*body*', htmlPart);
+        return htmlCssCombined;
+      } else {
+        return htmlPart;
+      }
+    }
+    return currentDocText;
+  }
 
   function updatePanel() {
     if (docLangIsSupported) {
@@ -80,30 +121,4 @@ function docLangIsSupported(): boolean {
   return docLangIsSupported;
 }
 
-function getComponentHTML(): string {
-  const currentDocText = vscode.window.activeTextEditor.document.getText();
-  const docLanguageId = vscode.window.activeTextEditor.document.languageId;
 
-  if (docLanguageId.toLocaleLowerCase() === 'html') {
-    return htmlTemplate.replace('*body*', currentDocText)
-  } else if (docLanguageId.toLocaleLowerCase() === 'vue') {
-    let htmlPart = 'I did not understand this html.';
-    let cssPart = 'I did not understand this css.';
-
-    const vueTemplateMatches = regVueTemplate.exec(currentDocText);
-    if (vueTemplateMatches.length > 0) {
-      htmlPart = vueTemplateMatches[0];
-    }
-    const vueStyleMatches = regVueStyle.exec(currentDocText);
-    if (vueStyleMatches.length > 0) {
-      cssPart = vueStyleMatches[0];
-      let htmlCssCombined = htmlTemplate
-        .replace('*styles*', cssPart)
-        .replace('*body*', htmlPart);
-      return htmlCssCombined;
-    } else {
-      return htmlPart;
-    }
-  }
-  return currentDocText;
-}
