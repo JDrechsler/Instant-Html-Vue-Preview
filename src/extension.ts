@@ -46,8 +46,8 @@ function startExtension(context: vscode.ExtensionContext) {
     },    
   );
   const workspaceFolderPath = vscode.workspace.workspaceFolders[0];
-  const tailwindConfigPath = path.join(workspaceFolderPath.uri.path, 'tailwind.config.js');
-  const mediaPath = vscode.Uri.file(path.join(workspaceFolderPath.uri.path, '')).with({
+  const tailwindConfigPath = path.join(workspaceFolderPath.uri.fsPath, 'tailwind.config.js');
+  const mediaPath = vscode.Uri.file(path.join(workspaceFolderPath.uri.fsPath, '')).with({
     scheme: "vscode-resource"
   }).toString() + '/';
   panel.onDidDispose(() => {}, null, context.subscriptions);

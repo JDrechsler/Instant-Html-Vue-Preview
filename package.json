@@ -2,7 +2,7 @@
   "name": "instant-html-vue-preview",
   "description": "Instant Preview HTML / Vue Files",
 	"displayName": "Instant Preview HTML / Vue Files",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "JDrechslerUS",
   "engines": {
     "vscode": "^1.26.0"
