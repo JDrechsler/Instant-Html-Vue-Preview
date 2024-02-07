@@ -1,6 +1,6 @@
-# Instant-Html-Vue-Preview
+# Instant-Preview
 
-A VS Code extension that allows previewing html / vue files while developing
+A VS Code extension that allows previewing html / astro / vue files while developing
 
 ## Install vsce tools
 

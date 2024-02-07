@@ -1,28 +1,28 @@
 {
-  "name": "instant-html-vue-preview",
-  "description": "Instant Preview HTML / Vue Files",
-	"displayName": "Instant Preview HTML / Vue Files",
-  "version": "0.0.4",
+  "name": "instant-preview-by-jd",
+  "description": "Instant Preview by JD",
+	"displayName": "Instant Preview by JD",
+  "version": "0.0.5",
   "publisher": "JDrechslerUS",
   "engines": {
     "vscode": "^1.26.0"
   },
   "repository": {
-    "url": "https://github.com/JDrechsler/Vue-Component-Preview"
+    "url": "https://github.com/JDrechsler/Instant-Preview"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onWebviewPanel:instantHtmlVueComponent"
+    "onWebviewPanel:instantPreview"
   ],
   "main": "./outDir/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "instantHtmlVueComponentPreview.start",
+        "command": "instantPreview.start",
         "title": "Start Preview",
-        "category": "Instant Html / Vue Preview"
+        "category": "Instant Preview By JD"
       }
     ]
   },

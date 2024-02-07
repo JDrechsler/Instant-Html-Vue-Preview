@@ -8,7 +8,7 @@ const regVueStyle = new RegExp(
   's'
 );
 
-const supportedDocLanguages = ['html', 'vue'];
+const supportedDocLanguages = ['html', 'vue', 'astro'];
 
 const htmlTemplate = `
   <!DOCTYPE html>
@@ -29,7 +29,7 @@ const htmlTemplate = `
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('instantHtmlVueComponentPreview.start', () => {
+    vscode.commands.registerCommand('instantPreview.start', () => {
       startExtension(context);
     })
   );
@@ -37,8 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 function startExtension(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
-    'instantHtmlVueComponent',
-    'Instant Html / Vue Preview',
+    'instantPreview',
+    'Instant Preview',
     vscode.ViewColumn.Beside,
     {
       retainContextWhenHidden: true,
@@ -47,11 +47,12 @@ function startExtension(context: vscode.ExtensionContext) {
   );
   const workspaceFolderPath = vscode.workspace.workspaceFolders[0];
   const tailwindConfigPath = path.join(workspaceFolderPath.uri.fsPath, 'tailwind.config.js');
-  const mediaPath = vscode.Uri.file(path.join(workspaceFolderPath.uri.fsPath, '')).with({
+  let mediaPath = vscode.Uri.file(path.join(workspaceFolderPath.uri.fsPath, '')).with({
     scheme: "vscode-resource"
   }).toString() + '/';
+  mediaPath = decodeURIComponent(mediaPath);
   panel.onDidDispose(() => {}, null, context.subscriptions);
-  panel.webview.html = getComponentHTML();
+  updatePanel()
 
   context.subscriptions.push(
     vscode.window.onDidChangeTextEditorSelection(e => {
@@ -72,23 +73,24 @@ function startExtension(context: vscode.ExtensionContext) {
     const docLanguageId = vscode.window.activeTextEditor.document.languageId;
   
     if (docLanguageId.toLocaleLowerCase() === 'html') {
-      let html = htmlTemplate
-        .replace('*baseHref*', `<base href="${mediaPath}">`)
-        .replace('*body*', currentDocText);
-
-      // Check if tailwind.config.js exists
-      if (fs.existsSync(tailwindConfigPath)) {
-        const tailwindConfigString = fs.readFileSync(tailwindConfigPath, 'utf8')
-          .replace('export default', 'tailwind.config =');
-        html = html.replace('*tailwindConfig*', tailwindConfigString);
+      return currentDocText;
+    }
+    else if (docLanguageId.toLocaleLowerCase() === 'astro') { 
+      let htmlPart = 'I did not understand this astro html.';
+      let res = currentDocText.split('---')
+      if (res.length > 1) {
+        htmlPart = res[2];
       } else {
-        html = html.replace('<script>*tailwindConfig*</script>', '');
+        htmlPart = res[0];
       }
-      
-      return html;
-    } else if (docLanguageId.toLocaleLowerCase() === 'vue') {
-      let htmlPart = 'I did not understand this html.';
-      let cssPart = 'I did not understand this css.';
+      // for astro replace "/assets with "public/assets since astro uses public folder but without the public in the path
+      htmlPart = htmlPart.replaceAll('"/assets', '"public/assets');
+      htmlPart = htmlPart.replaceAll("'/assets", "'public/assets");
+      return htmlPart;
+    }
+    else if (docLanguageId.toLocaleLowerCase() === 'vue') {
+      let htmlPart = 'I did not understand this vue html.';
+      let cssPart = 'I did not understand this vue css.';
   
       const vueTemplateMatches = regVueTemplate.exec(currentDocText);
       if (vueTemplateMatches.length > 0) {
@@ -110,7 +112,22 @@ function startExtension(context: vscode.ExtensionContext) {
 
   function updatePanel() {
     if (docLangIsSupported) {
-      panel.webview.html = getComponentHTML();
+      let componentHtml = getComponentHTML();
+
+      let panelHtml = htmlTemplate
+        .replace('*baseHref*', `<base href="${mediaPath}">`)
+        .replace('*body*', componentHtml);
+
+      // Check if tailwind.config.js exists
+      if (fs.existsSync(tailwindConfigPath)) {
+        const tailwindConfigString = fs.readFileSync(tailwindConfigPath, 'utf8')
+          .replace('export default', 'tailwind.config =');
+        panelHtml = panelHtml.replace('*tailwindConfig*', tailwindConfigString);
+      } else {
+        panelHtml = panelHtml.replace('<script>*tailwindConfig*</script>', '');
+      }
+
+      panel.webview.html = panelHtml;
     }
   }
 }
