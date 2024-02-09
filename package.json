@@ -2,7 +2,7 @@
   "name": "instant-preview-by-jd",
   "description": "Instant Preview by JD",
 	"displayName": "Instant Preview by JD",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "publisher": "JDrechslerUS",
   "engines": {
     "vscode": "^1.26.0"

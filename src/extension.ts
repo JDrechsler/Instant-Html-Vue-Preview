@@ -20,6 +20,18 @@ const htmlTemplate = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>*tailwindConfig*</script>
+    <style>
+      body {
+        overscroll-behavior-x: inherit;
+        background-color: inherit;
+        color: initial;
+        font-family: inherit;
+        font-weight: inherit;
+        font-size: inherit;
+        margin: inherit;
+        padding: inherit;
+      }
+    </style>
   </head>
   <body>
     *body*
@@ -83,9 +95,7 @@ function startExtension(context: vscode.ExtensionContext) {
       } else {
         htmlPart = res[0];
       }
-      // for astro replace "/assets with "public/assets since astro uses public folder but without the public in the path
-      htmlPart = htmlPart.replaceAll('"/assets', '"public/assets');
-      htmlPart = htmlPart.replaceAll("'/assets", "'public/assets");
+      
       return htmlPart;
     }
     else if (docLanguageId.toLocaleLowerCase() === 'vue') {
@@ -127,6 +137,10 @@ function startExtension(context: vscode.ExtensionContext) {
         panelHtml = panelHtml.replace('<script>*tailwindConfig*</script>', '');
       }
 
+      // for astro replace "/assets with "public/assets since astro uses public folder but without the public in the path
+      panelHtml = panelHtml.replaceAll('"/assets', '"public/assets');
+      panelHtml = panelHtml.replaceAll("'/assets", "'public/assets");
+
       panel.webview.html = panelHtml;
     }
   }
@@ -137,5 +151,3 @@ function docLangIsSupported(): boolean {
   const docLangIsSupported = supportedDocLanguages.includes(currDocLang);
   return docLangIsSupported;
 }
-
-
